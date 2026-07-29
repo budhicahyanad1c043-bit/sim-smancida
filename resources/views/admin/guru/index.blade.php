@@ -207,7 +207,7 @@
                             @method('DELETE')
                             <button type="submit" 
                                     class="w-full sm:w-auto px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-md shadow-rose-100 transition duration-150">
-                                Ya, Hapus Data
+                                Ya, Hapus Data.
                             </button>
                         </form>
                     </div>
