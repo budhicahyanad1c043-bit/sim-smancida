@@ -14,7 +14,7 @@ class KelasController extends Controller
     {
         // Eager loading waliKelas dan hitung jumlah siswa per kelas
         // Eager loading waliKelas dan hitung jumlah siswa per kelas
-        $kelases = Kelas::with(['waliKelas'])->withCount('siswas')->latest()->get();
+        $kelases = Kelas::with(['waliKelas'])->withCount('siswas')->latest()->paginate(10);
 
         // AMBIL MODEL GURU yang relasi user-nya memiliki role 'walikelas'
         $gurus = Guru::whereHas('user', function ($query) {
