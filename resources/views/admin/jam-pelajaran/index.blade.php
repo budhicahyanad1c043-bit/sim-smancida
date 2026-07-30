@@ -15,6 +15,17 @@
                     Tambah Jam Pelajaran
                 </button>
             </div>
+            <!-- Alert Error Validasi -->
+            @if ($errors->any())
+                <div class="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-xl shadow-xs">
+                    <div class="font-semibold text-sm mb-1">Gagal menyimpan data:</div>
+                    <ul class="list-disc list-inside text-xs space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
     </x-slot>
 
