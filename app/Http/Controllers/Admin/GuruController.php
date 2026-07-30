@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Rap2hpoutre\FastExcel\FastExcel; // Plugin rap2hpoutre
 
 class GuruController extends Controller
 {
@@ -51,6 +52,64 @@ class GuruController extends Controller
         });
 
         return redirect()->route('admin.guru.index')->with('success', 'Data Guru berhasil ditambahkan!');
+    }
+
+    // Method baru untuk Fitur Import Excel
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request) {
+                (new FastExcel)->import($request->file('file'), function ($line) {
+                    // Ambil data header dari Excel (case-insensitive fallback)
+                    $nama = $line['nama'] ?? $line['Nama'] ?? $line['nama_guru'] ?? null;
+                    $email = $line['email'] ?? $line['Email'] ?? null;
+                    $nip = $line['nip'] ?? $line['NIP'] ?? null;
+                    $gender = strtoupper(trim($line['gender'] ?? $line['Gender'] ?? $line['jenis_kelamin'] ?? 'L'));
+                    $alamat = $line['alamat'] ?? $line['Alamat'] ?? null;
+
+                    // Lewati jika nama atau email kosong
+                    if (!$nama || !$email) {
+                        return null;
+                    }
+
+                    // Hanya ambil 1 karakter awal (L atau P)
+                    $genderFormatted = in_array(substr($gender, 0, 1), ['L', 'P']) ? substr($gender, 0, 1) : 'L';
+
+                    // Buat atau cari user berdasarkan email
+                    $user = User::firstOrCreate(
+                        ['email' => $email],
+                        [
+                            'name' => $nama,
+                            'password' => Hash::make('password123'),
+                        ]
+                    );
+
+                    // Berikan role guru jika menggunakan Spatie Permission
+                    if (method_exists($user, 'assignRole')) {
+                        $user->assignRole('guru');
+                    }
+
+                    // Buat atau update data guru
+                    Guru::updateOrCreate(
+                        ['user_id' => $user->id],
+                        [
+                            'nama_guru' => $nama,
+                            'nip' => $nip,
+                            'gender' => $genderFormatted,
+                            'alamat' => $alamat,
+                        ]
+                    );
+                });
+            });
+
+            return redirect()->route('admin.guru.index')->with('success', 'Import data guru dari Excel berhasil!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengimpor file: ' . $e->getMessage());
+        }
     }
 
     public function edit(Guru $guru)

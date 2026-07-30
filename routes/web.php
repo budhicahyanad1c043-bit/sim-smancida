@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\JadwalPelajaranController;
 use App\Http\Controllers\Admin\JamPelajaranController;
 
+
 // Redirect Halaman Utama ke Login
 Route::get('/', function () {
     return redirect()->route('login');
@@ -76,6 +77,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('jadwal', [JadwalPelajaranController::class, 'index'])->name('jadwal.index');
     Route::post('jadwal', [JadwalPelajaranController::class, 'store'])->name('jadwal.store');
     Route::delete('jadwal/{jadwal}', [JadwalPelajaranController::class, 'destroy'])->name('jadwal.destroy');
+    Route::post('guru/import', [GuruController::class, 'import'])->name('guru.import');
     
 });
 
