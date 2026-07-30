@@ -27,16 +27,10 @@
 
     <!-- Wrap Alpine x-data -->
     <div x-data="{ 
-            search: '',
             deleteModalOpen: false,
             importModalOpen: false,
             deleteActionUrl: '',
             deleteItemName: '',
-            
-            filterRow(text) {
-                if (this.search === '') return true;
-                return text.toLowerCase().includes(this.search.toLowerCase());
-            },
 
             confirmDelete(url, name) {
                 this.deleteActionUrl = url;
@@ -62,27 +56,39 @@
                 </div>
             @endif
 
-            <!-- Filter Search Bar -->
-            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs flex items-center justify-between gap-4">
+            <!-- Server-Side Search Bar -->
+            <form method="GET" action="{{ route('admin.guru.index') }}" class="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs flex items-center justify-between gap-4">
                 <div class="relative flex-1 max-w-md">
-                    <input x-model="search" type="text" placeholder="Cari nama, NIP, atau email..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="text" 
+                           name="search" 
+                           value="{{ request('search') }}" 
+                           placeholder="Cari nama, NIP, NIK, NUPTK, atau email..." 
+                           class="w-full pl-10 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
+                    @if(request('search'))
+                        <a href="{{ route('admin.guru.index') }}" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                            &times;
+                        </a>
+                    @endif
                 </div>
-            </div>
+            </form>
 
             <!-- ================= MOBILE VIEW (CARDS) ================= -->
             <div class="grid grid-cols-1 gap-3 md:hidden">
                 @forelse($gurus as $guru)
                     @php $namaGuru = $guru->nama_guru ?? $guru->user->name ?? '-'; @endphp
-                    <div x-show="filterRow('{{ addslashes($namaGuru . ' ' . $guru->nip) }}')" 
-                         class="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs space-y-3">
+                    <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs space-y-3">
                         <div class="flex items-start justify-between gap-2">
                             <div>
                                 <h4 class="font-bold text-sm text-gray-900">{{ $namaGuru }}</h4>
-                                <p class="text-xs text-gray-500 mt-0.5">NIP: <span class="font-mono text-gray-700">{{ $guru->nip ?? '-' }}</span></p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ $guru->user->email ?? '-' }}</p>
+                                <div class="mt-2 space-y-1 text-xs text-gray-500">
+                                    <p>NIP: <span class="font-mono text-gray-700">{{ $guru->nip ?? '-' }}</span></p>
+                                    <p>NIK: <span class="font-mono text-gray-700">{{ $guru->nik ?? '-' }}</span></p>
+                                    <p>NUPTK: <span class="font-mono text-gray-700">{{ $guru->nuptk ?? '-' }}</span></p>
+                                </div>
                             </div>
                         </div>
 
@@ -102,7 +108,7 @@
                         </div>
                     </div>
                 @empty
-                    <div class="bg-white p-6 rounded-2xl text-center text-xs text-gray-400">Belum ada data guru.</div>
+                    <div class="bg-white p-6 rounded-2xl text-center text-xs text-gray-400">Data guru tidak ditemukan.</div>
                 @endforelse
 
                 <!-- Pagination Mobile -->
@@ -118,18 +124,22 @@
                         <tr class="bg-gray-50/70 border-b border-gray-100 text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                             <th class="py-3.5 px-6">Nama Guru</th>
                             <th class="py-3.5 px-6">NIP</th>
+                            <th class="py-3.5 px-6">NIK</th>
+                            <th class="py-3.5 px-6">NUPTK</th>
                             <th class="py-3.5 px-6 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100 text-xs text-gray-700">
                         @forelse($gurus as $guru)
                             @php $namaGuru = $guru->nama_guru ?? $guru->user->name ?? '-'; @endphp
-                            <tr x-show="filterRow('{{ addslashes($namaGuru . ' ' . $guru->nip) }}')" class="hover:bg-indigo-50/30 transition duration-150">
+                            <tr class="hover:bg-indigo-50/30 transition duration-150">
                                 <td class="py-3.5 px-6 font-bold text-gray-900">
                                     <div>{{ $namaGuru }}</div>
                                     <div class="text-[11px] text-gray-400 font-normal">{{ $guru->user->email ?? '-' }}</div>
                                 </td>
                                 <td class="py-3.5 px-6 font-mono text-gray-600">{{ $guru->nip ?? '-' }}</td>
+                                <td class="py-3.5 px-6 font-mono text-gray-600">{{ $guru->nik ?? '-' }}</td>
+                                <td class="py-3.5 px-6 font-mono text-gray-600">{{ $guru->nuptk ?? '-' }}</td>
                                 <td class="py-3.5 px-6">
                                     <!-- Action Buttons Desktop -->
                                     <div class="flex items-center justify-end gap-1.5">
@@ -151,7 +161,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="3" class="py-8 text-center text-xs text-gray-400">Belum ada data guru.</td></tr>
+                            <tr><td colspan="5" class="py-8 text-center text-xs text-gray-400">Data guru tidak ditemukan.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

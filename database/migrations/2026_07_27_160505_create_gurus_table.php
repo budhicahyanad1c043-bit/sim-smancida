@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('nama_guru');
             $table->string('nip',18)->nullable()->unique();
             $table->string('nik',16)->nullable()->unique();
+             $table->string('nuptk',16)->nullable()->unique();
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tgl_lahir')->nullable();
             $table->enum('gender', ['L', 'P']);
             $table->text('alamat')->nullable();
             $table->string('desa')->nullable();
