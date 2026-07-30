@@ -155,6 +155,16 @@ class SiswaController extends Controller
         try {
             // Membaca file excel baris demi baris secara streaming
             (new FastExcel)->import($request->file('file_excel'), function ($row) {
+
+                // Normalize Gender
+                $rawGender = strtoupper(trim($row['gender'] ?? ''));
+                $gender = null;
+
+                if (in_array($rawGender, ['L', 'LAKI-LAKI', 'LAKI LAKI', 'MALE'])) {
+                    $gender = 'L';
+                } elseif (in_array($rawGender, ['P', 'PEREMPUAN', 'FEMALE'])) {
+                    $gender = 'P';
+                }
                 
                 // Cari ID kelas jika kolom 'kelas' diisi di excel
                 $kelasId = null;

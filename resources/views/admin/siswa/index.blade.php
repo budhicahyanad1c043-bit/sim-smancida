@@ -157,10 +157,12 @@
                                     <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold rounded-md text-[10px]">
                                         {{ $siswa->kelas->nama_kelas ?? $siswa->kelas->nama ?? 'Tanpa Kelas' }}
                                     </span>
-                                    @if($siswa->gender === 'L')
+                                    @if(strtoupper($siswa->gender) === 'L')
                                         <span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded-md text-[10px]">Laki-laki</span>
-                                    @else
+                                    @elseif(strtoupper($siswa->gender) === 'P')
                                         <span class="px-2 py-0.5 bg-pink-50 text-pink-600 font-bold rounded-md text-[10px]">Perempuan</span>
+                                    @else
+                                        <span class="px-2 py-0.5 bg-gray-50 text-gray-500 font-bold rounded-md text-[10px]">-</span>
                                     @endif
                                 </div>
                             </div>
@@ -247,10 +249,16 @@
                                     <td class="px-4 py-3.5">
                                         <div class="font-bold text-gray-800">{{ $siswa->nama_siswa }}</div>
                                         <div class="mt-1">
-                                            @if($siswa->gender === 'L')
+                                            @php
+                                                $gender = strtoupper(trim($siswa->gender ?? ''));
+                                            @endphp
+
+                                            @if(in_array($gender, ['L', 'l', 'LAKI-LAKI', 'LAKI LAKI']))
                                                 <span class="px-2 py-0.5 bg-blue-50 text-blue-600 font-bold rounded-md text-[10px]">Laki-laki</span>
-                                            @else
+                                            @elseif(in_array($gender, ['P', 'PEREMPUAN']))
                                                 <span class="px-2 py-0.5 bg-pink-50 text-pink-600 font-bold rounded-md text-[10px]">Perempuan</span>
+                                            @else
+                                                <span class="px-2 py-0.5 bg-gray-50 text-gray-500 font-bold rounded-md text-[10px]">-</span>
                                             @endif
                                         </div>
                                     </td>
@@ -469,4 +477,4 @@
         </div>
 
     </div>
-</x-app-layout>
+</x-app-layout> 
