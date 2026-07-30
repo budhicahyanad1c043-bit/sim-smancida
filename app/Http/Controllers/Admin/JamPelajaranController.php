@@ -14,7 +14,7 @@ class JamPelajaranController extends Controller
     public function index()
     {
         // Mengambil semua data jam pelajaran diurutkan berdasarkan jam_ke
-        $jamPelajarans = JamPelajaran::orderBy('jam_ke', 'asc')->paginate(10);
+        $jamPelajarans = JamPelajaran::orderBy('jam_ke', 'asc')->paginate(7); // Pagination 20 per halaman
         return view('admin.jam-pelajaran.index', compact('jamPelajarans'));
     }
 

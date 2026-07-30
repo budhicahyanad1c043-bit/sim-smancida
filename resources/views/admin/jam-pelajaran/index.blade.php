@@ -157,9 +157,10 @@
             </div>
 
             <!-- Section Pagination -->
-            @if($jamPelajarans->hasPages())
-                <div class="pt-2">
-                    {{ $jamPelajarans->links() }}
+            @if(isset($jamPelajarans) && $jamPelajarans->hasPages())
+                <div class="mt-4 px-4 sm:px-0">
+                    {{-- Memanggil UI pagination bawaan Tailwind --}}
+                    {{ $jamPelajarans->links('pagination::tailwind') }}
                 </div>
             @endif
 
