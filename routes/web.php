@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
 // 1. ROLE: ADMIN
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
+    Route::post('guru/import', [GuruController::class, 'import'])->name('guru.import');
     Route::resource('guru', GuruController::class);
     Route::resource('mapel', MataPelajaranController::class);
     Route::resource('role', RoleController::class);
@@ -77,7 +78,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('jadwal', [JadwalPelajaranController::class, 'index'])->name('jadwal.index');
     Route::post('jadwal', [JadwalPelajaranController::class, 'store'])->name('jadwal.store');
     Route::delete('jadwal/{jadwal}', [JadwalPelajaranController::class, 'destroy'])->name('jadwal.destroy');
-    Route::post('guru/import', [GuruController::class, 'import'])->name('guru.import');
     
 });
 
