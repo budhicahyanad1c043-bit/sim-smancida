@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\JadwalPelajaranController;
 use App\Http\Controllers\Admin\JamPelajaranController;
+use App\Http\Controllers\JadwalPelajaranSGController;
 
 
 // Redirect Halaman Utama ke Login
@@ -86,6 +87,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(f
     Route::get('/dashboard', [DashboardController::class, 'guru'])->name('dashboard');
     Route::get('/absensi', [AbsensiMapelController::class, 'index'])->name('absensi.index');
     Route::post('/absensi', [AbsensiMapelController::class, 'store'])->name('absensi.store');
+    Route::get('/jadwal-pelajaran', [JadwalPelajaranSGController::class, 'indexGuru'])->name('jadwal.index');
 });
 
 // 3. ROLE: WALI KELAS
@@ -110,6 +112,7 @@ Route::middleware(['auth', 'role:kepala_sekolah'])->prefix('kepsek')->name('keps
 // 6. ROLE: SISWA
 Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [PortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/jadwal-pelajaran', [JadwalPelajaranController::class, 'indexSiswa'])->name('jadwal.index');
 });
 
 require __DIR__.'/auth.php';

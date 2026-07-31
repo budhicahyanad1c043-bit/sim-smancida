@@ -11,6 +11,7 @@ class JamPelajaran extends Model
 
     protected $fillable = [
         'jam_ke',
+        'hari',
         'nama',
         'jam_mulai',
         'jam_selesai',

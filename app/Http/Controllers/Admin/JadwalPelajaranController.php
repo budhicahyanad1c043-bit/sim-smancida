@@ -17,7 +17,7 @@ class JadwalPelajaranController extends Controller
         $kelasId = $request->input('kelas_id');
         $kelases = Kelas::all();
         $jamPelajarans = JamPelajaran::orderBy('jam_ke')->get();
-        $haris = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        $haris = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
         // Ambil jadwal terstruktur berdasarkan Kelas jika dipilih
         $jadwals = [];

@@ -160,6 +160,17 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Dashboard Guru</span>
             </a>
+
+            <!-- JADWAL PELAJARAN (BARU DITAMBAHKAN) -->
+            <a href="{{ route('guru.jadwal.index') }}" 
+               title="Jadwal Mengajar"
+               class="flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 {{ request()->routeIs('guru.jadwal.*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600' }}"
+               :class="sidebarCollapsed ? 'lg:justify-center lg:px-0' : ''">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Jadwal Mengajar</span>
+            </a>
             
             <a href="{{ route('guru.absensi.index') }}" 
                title="Absensi Mapel"
@@ -188,6 +199,31 @@
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Absensi Harian</span>
             </a>
+        @endif
+
+        <!-- ================= MODE SISWA ================= -->
+        @if ($activeRole === 'siswa')
+
+            <!-- DASHBOARD -->
+            <a href="{{ route('siswa.dashboard') }}" 
+               title="Dashboard Siswa"
+               class="flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 {{ request()->routeIs('siswa.dashboard') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600' }}"
+               :class="sidebarCollapsed ? 'lg:justify-center lg:px-0' : ''">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Dashboard</span>
+            </a>
+
+            <!-- JADWAL PELAJARAN (BARU DITAMBAHKAN) -->
+            <a href="{{ route('siswa.jadwal.index') }}" 
+               title="Jadwal Pelajaran"
+               class="flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 {{ request()->routeIs('siswa.jadwal.*') ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' : 'text-gray-600 hover:bg-gray-50 hover:text-indigo-600' }}"
+               :class="sidebarCollapsed ? 'lg:justify-center lg:px-0' : ''">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span x-show="!sidebarCollapsed" class="whitespace-nowrap">Jadwal Pelajaran</span>
+            </a>
+
         @endif
 
     </div>
