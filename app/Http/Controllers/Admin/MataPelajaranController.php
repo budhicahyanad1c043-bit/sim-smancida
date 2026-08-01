@@ -8,9 +8,18 @@ use Illuminate\Http\Request;
 
 class MataPelajaranController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $mapels = MataPelajaran::orderBy('nama_mapel', 'asc')->paginate(10);
+        $search = $request->input('search');
+
+        $mapels = MataPelajaran::when($search, function ($query, $search) {
+            return $query->where('nama_mapel', 'like', "%{$search}%")
+                        ->orWhere('kode_mapel', 'like', "%{$search}%");
+        })
+        ->orderBy('nama_mapel', 'asc') // Tetap terurut A-Z
+        ->paginate(10)
+        ->withQueryString(); // Memastikan parameter search tetap terbawa saat ganti halaman pagination
+
         return view('admin.mapel.index', compact('mapels'));
     }
 

@@ -16,8 +16,7 @@ class AbsensiMapelController extends Controller
     public function index(Request $request)
     {
         $kelases = Kelas::all();
-        $mapels = MataPelajaran::all();
-
+        $mapels = MataPelajaran::orderBy('nama_mapel', 'asc')->get();
         $tanggalInput = $request->input('tanggal', date('Y-m-d'));
         $tanggal = Carbon::parse($tanggalInput)->format('Y-m-d');
 

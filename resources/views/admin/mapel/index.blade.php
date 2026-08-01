@@ -130,7 +130,7 @@
                 <!-- Footer / Pagination Dynamic -->
                 @if ($mapels->hasPages())
                     <div class="p-4 border-t border-slate-100 bg-slate-50/50">
-                        {{ $mapels->links() }}
+                        {{ $mapels->appends(request()->query())->links() }}
                     </div>
                 @endif
 
