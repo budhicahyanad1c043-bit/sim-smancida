@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\JamPelajaranController;
 use App\Http\Controllers\JadwalPelajaranSGController;
 
 
+
 // Redirect Halaman Utama ke Login
 Route::get('/', function () {
     return redirect()->route('login');
@@ -88,6 +89,8 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(f
     Route::get('/absensi', [AbsensiMapelController::class, 'index'])->name('absensi.index');
     Route::post('/absensi', [AbsensiMapelController::class, 'store'])->name('absensi.store');
     Route::get('/jadwal-pelajaran', [JadwalPelajaranSGController::class, 'indexGuru'])->name('jadwal.index');
+    Route::get('/absensi/rekap', [AbsensiMapelController::class, 'rekap'])->name('absensi.rekap');
+    
 });
 
 // 3. ROLE: WALI KELAS

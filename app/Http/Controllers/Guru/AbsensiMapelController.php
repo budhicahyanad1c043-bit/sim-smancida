@@ -10,6 +10,7 @@ use App\Models\Siswa;
 use App\Models\Guru;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AbsensiMapelController extends Controller
 {
@@ -85,4 +86,49 @@ class AbsensiMapelController extends Controller
             'tanggal'  => $tanggal,
         ])->with('success', 'Data absensi mata pelajaran berhasil disimpan!');
     }
+
+    public function rekap(Request $request)
+    {
+        $request->validate([
+            'tanggal_mulai'   => 'required',
+            'tanggal_selesai' => 'required',
+            'kelas_id'        => 'required',
+            'mapel_id'        => 'required',
+        ]);
+
+        // 1. Pastikan Format Tanggal Sesuai (YYYY-MM-DD)
+        $tglMulai   = Carbon::parse($request->tanggal_mulai)->format('Y-m-d');
+        $tglSelesai = Carbon::parse($request->tanggal_selesai)->format('Y-m-d');
+
+        // 2. Ambil data Kelas dan Mata Pelajaran
+        $kelas = Kelas::find($request->kelas_id);
+        $mapel = MataPelajaran::find($request->mapel_id);
+
+        // 3. Ambil daftar Siswa
+        $siswas = Siswa::where('kelas_id', $request->kelas_id)
+            ->orderBy('nama_siswa', 'asc')
+            ->get();
+
+        // 4. Query Rekapitulasi (PERBAIKAN: Gunakan 'mata_pelajaran_id')
+        $rekapRaw = Absensi::where('kelas_id', $request->kelas_id)
+            ->where('mata_pelajaran_id', $request->mapel_id)
+            ->whereBetween('tanggal', [$tglMulai, $tglSelesai])
+            ->get();
+
+        // Grouping & Counting secara manual per siswa
+        $rekap = [];
+        foreach ($siswas as $siswa) {
+            $absensiSiswa = $rekapRaw->where('siswa_id', $siswa->id);
+            
+            $rekap[$siswa->id] = (object) [
+                'total_hadir' => $absensiSiswa->filter(fn($a) => strtolower($a->status) === 'hadir')->count(),
+                'total_izin'  => $absensiSiswa->filter(fn($a) => strtolower($a->status) === 'izin')->count(),
+                'total_sakit' => $absensiSiswa->filter(fn($a) => strtolower($a->status) === 'sakit')->count(),
+                'total_alpa'  => $absensiSiswa->filter(fn($a) => strtolower($a->status) === 'alpa')->count(),
+            ];
+        }
+
+        return view('guru.absensi.rekap-pdf', compact('siswas', 'rekap', 'kelas', 'mapel', 'request', 'tglMulai', 'tglSelesai'));
+    }
+
 }
