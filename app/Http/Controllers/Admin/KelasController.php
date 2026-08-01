@@ -13,13 +13,12 @@ class KelasController extends Controller
     public function index()
     {
         // Eager loading waliKelas dan hitung jumlah siswa per kelas
-        // Eager loading waliKelas dan hitung jumlah siswa per kelas
-        $kelases = Kelas::with(['waliKelas'])->withCount('siswas')->latest()->paginate(10);
+        $kelases = Kelas::with(['waliKelas'])->withCount('siswas')->orderBy('nama_kelas', 'asc')->paginate(10);
 
         // AMBIL MODEL GURU yang relasi user-nya memiliki role 'walikelas'
         $gurus = Guru::whereHas('user', function ($query) {
             $query->role('walikelas'); // Menggunakan Spatie Permission
-        })->orderBy('nama_kelas', 'asc')->get();
+        })->get();
 
         return view('admin.kelas.index', compact('kelases', 'gurus'));
     }
