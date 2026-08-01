@@ -10,7 +10,7 @@ class MataPelajaranController extends Controller
 {
     public function index()
     {
-        $mapels = MataPelajaran::latest()->paginate(10);
+        $mapels = MataPelajaran::orderBy('nama_mapel', 'asc')->paginate(10);
         return view('admin.mapel.index', compact('mapels'));
     }
 
