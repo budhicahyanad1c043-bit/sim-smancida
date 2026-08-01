@@ -19,7 +19,7 @@ class KelasController extends Controller
         // AMBIL MODEL GURU yang relasi user-nya memiliki role 'walikelas'
         $gurus = Guru::whereHas('user', function ($query) {
             $query->role('walikelas'); // Menggunakan Spatie Permission
-        })->get();
+        })->orderBy('nama_kelas', 'asc')->get();
 
         return view('admin.kelas.index', compact('kelases', 'gurus'));
     }

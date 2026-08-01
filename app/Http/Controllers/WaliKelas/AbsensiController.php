@@ -31,7 +31,9 @@ class AbsensiController extends Controller
         $existingAbsensi = collect();
 
         if ($kelas) {
-            $siswas = Siswa::where('kelas_id', $kelas->id)->get();
+            $siswas = Siswa::where('kelas_id', $kelas->id)
+                ->orderBy('nama_siswa', 'asc')
+                ->get();
 
             // Ambil data absensi harian yang tersimpan
             $existingAbsensi = Absensi::where('kelas_id', $kelas->id)

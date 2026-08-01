@@ -28,7 +28,9 @@ class AbsensiMapelController extends Controller
         $existingAbsensi = collect();
 
         if ($selectedKelas && $selectedMapel) {
-            $siswas = Siswa::where('kelas_id', $selectedKelas)->get();
+            $siswas = Siswa::where('kelas_id', $selectedKelas)
+            ->orderBy('nama_siswa', 'asc')
+            ->get();
 
             // KUNCI PERBAIKAN: Gunakan 'mata_pelajaran_id' sesuai isi Model Absensi
             $existingAbsensi = Absensi::where('kelas_id', $selectedKelas)
