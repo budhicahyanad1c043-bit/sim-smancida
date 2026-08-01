@@ -19,14 +19,14 @@ class SiswaController extends Controller
 
         // Parameter Sorting
         $sortBy = $request->input('sort_by', 'created_at'); // Default sort berdasarkan created_at
-        $sortDirection = $request->input('sort_direction', 'desc'); // Default direction 'desc'
+        $sortDirection = $request->input('sort_direction', 'asc'); // Default direction 'asc'
 
         // Validasi kolom yang diizinkan untuk di-sort
         $allowedSorts = ['nama_siswa', 'kelas'];
         if (!in_array($sortBy, $allowedSorts)) {
             $sortBy = 'created_at';
         }
-        $sortDirection = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+        $sortDirection = strtolower($sortDirection) === 'desc' ? 'desc' : 'asc';
 
         $siswas = Siswa::with(['kelas', 'user'])
             ->when($search, function ($query, $search) {
