@@ -69,13 +69,13 @@ class AbsensiMapelController extends Controller
         // -------------------------------------------------------------
         $incomingDeviceId = $request->input('device_id');
 
-        // Jika user/guru belum terdaftar device_token-nya, kunci ke device ini
-        if (empty($user->device_token)) {
-            $user->update(['device_token' => $incomingDeviceId]);
+        // Jika device_token di DB masih kosong, kunci ke perangkat saat ini
+        if (!$user->device_token) {
+            $user->forceFill(['device_token' => $incomingDeviceId])->save();
         } 
-        // Jika sudah ada, cocokkan apakah perangkat yang dipakai sama
+        // Jika berbeda dengan device_token yang terdaftar
         else if ($user->device_token !== $incomingDeviceId) {
-            return redirect()->back()->with('error', 'Gagal Absen! Anda menggunakan perangkat yang berbeda dengan yang terdaftar. Harap gunakan HP/Laptop utama Anda.');
+            return redirect()->back()->with('error', 'Gagal Absen! Akun Anda sudah terdaftar di HP/Laptop lain. Harap gunakan perangkat utama Anda.');
         }
 
         // -------------------------------------------------------------
@@ -88,9 +88,10 @@ class AbsensiMapelController extends Controller
         // $sekolahLat = env('SEKOLAH_LATITUDE', -6.200000); 
         // $sekolahLng = env('SEKOLAH_LONGITUDE', 106.816666);
         // $maxRadius  = env('SEKOLAH_RADIUS_METER', 50); // Maksimal 50 meter
-        $sekolahLat = \App\Models\Pengaturan::where('key', 'latitude')->value('value') ?? -6.8700621303246825;
-        $sekolahLng = \App\Models\Pengaturan::where('key', 'longitude')->value('value') ?? 106.77236014143656;
-        $maxRadius  = \App\Models\Pengaturan::where('key', 'radius')->value('value') ?? 100;
+        // Ambil setting lokasi dari tabel pengaturans
+        $sekolahLat = (float) (\App\Models\Pengaturan::where('key', 'latitude')->value('value') ?? -6.8700621);
+        $sekolahLng = (float) (\App\Models\Pengaturan::where('key', 'longitude')->value('value') ?? 106.7723601);
+        $maxRadius  = (float) (\App\Models\Pengaturan::where('key', 'radius')->value('value') ?? 100);
 
         $jarak = $this->hitungJarakHaversine(
             $request->latitude, 

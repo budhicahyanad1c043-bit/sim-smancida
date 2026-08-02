@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+
 class AuthenticatedSessionController extends Controller
 {
     /**
@@ -27,6 +28,9 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        // Mengeluarkaan (logout) akun ini dari HP/Laptop/Browser lain secara otomatis
+        Auth::logoutOtherDevices($request->password);
 
         // Reset Cache Permission Spatie saat Login
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
