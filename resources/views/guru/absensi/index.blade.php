@@ -80,111 +80,110 @@
 
             <!-- List Presensi Responsif (Single Component) -->
             @if (isset($siswas) && count($siswas) > 0)
+            <form action="{{ route('guru.absensi.store') }}" method="POST">
+                @csrf
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <form action="{{ route('guru.absensi.store') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="kelas_id" value="{{ $selectedKelas }}">
-                        <input type="hidden" name="mapel_id" value="{{ $selectedMapel }}">
-                        <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+                    <input type="hidden" name="kelas_id" value="{{ $selectedKelas }}">
+                    <input type="hidden" name="mapel_id" value="{{ $selectedMapel }}">
+                    <input type="hidden" name="tanggal" value="{{ $tanggal }}">
 
-                        <div class="divide-y divide-gray-100">
-                            @foreach ($siswas as $index => $siswa)
-                                @php
-                                    $dataAbsensi = $existingAbsensi->get($siswa->id);
-                                    // Default status = 'Hadir' jika belum diisi
-                                    $statusAwal = $dataAbsensi ? strtolower($dataAbsensi->status) : 'hadir';
-                                    $currentKeterangan = $dataAbsensi ? $dataAbsensi->keterangan : '';
-                                @endphp
+                    <div class="divide-y divide-gray-100">
+                        @foreach ($siswas as $index => $siswa)
+                            @php
+                                $dataAbsensi = $existingAbsensi->get($siswa->id);
+                                // Default status = 'Hadir' jika belum diisi
+                                $statusAwal = $dataAbsensi ? strtolower($dataAbsensi->status) : 'hadir';
+                                $currentKeterangan = $dataAbsensi ? $dataAbsensi->keterangan : '';
+                            @endphp
 
-                                <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-indigo-50/20 transition-colors">
+                            <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-indigo-50/20 transition-colors">
+                                
+                                <!-- Informasi Siswa -->
+                                <div class="flex items-center gap-3 sm:w-1/3">
+                                    <span class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                        {{ $index + 1 }}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <h4 class="font-bold text-sm sm:text-base text-gray-800 truncate">{{ $siswa->nama_siswa }}</h4>
+                                        <p class="font-mono text-[11px] sm:text-xs text-gray-400 mt-0.5">NISN: {{ $siswa->nisn }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Opsi Kehadiran (4 Tombol Radio) -->
+                                <div class="grid grid-cols-4 gap-1.5 sm:gap-2 sm:w-auto">
                                     
-                                    <!-- Informasi Siswa -->
-                                    <div class="flex items-center gap-3 sm:w-1/3">
-                                        <span class="w-7 h-7 rounded-full bg-gray-100 text-gray-500 font-bold text-xs flex items-center justify-center flex-shrink-0">
-                                            {{ $index + 1 }}
-                                        </span>
-                                        <div class="min-w-0">
-                                            <h4 class="font-bold text-sm sm:text-base text-gray-800 truncate">{{ $siswa->nama_siswa }}</h4>
-                                            <p class="font-mono text-[11px] sm:text-xs text-gray-400 mt-0.5">NISN: {{ $siswa->nisn }}</p>
+                                    <!-- HADIR -->
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="absensi[{{ $siswa->id }}]" value="Hadir" 
+                                            {{ $statusAwal === 'hadir' ? 'checked' : '' }} 
+                                            class="peer sr-only">
+                                        <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
+                                            peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:border-emerald-500 
+                                            flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 peer-checked:bg-white transition-colors"></span>
+                                            <span>Hadir</span>
                                         </div>
-                                    </div>
+                                    </label>
 
-                                    <!-- Opsi Kehadiran (4 Tombol Radio) -->
-                                    <div class="grid grid-cols-4 gap-1.5 sm:gap-2 sm:w-auto">
-                                        
-                                        <!-- HADIR -->
-                                        <label class="relative cursor-pointer">
-                                            <input type="radio" name="absensi[{{ $siswa->id }}]" value="Hadir" 
-                                                {{ $statusAwal === 'hadir' ? 'checked' : '' }} 
-                                                class="peer sr-only">
-                                            <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
-                                                peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:border-emerald-500 
-                                                flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
-                                                <span class="w-2 h-2 rounded-full bg-emerald-500 peer-checked:bg-white transition-colors"></span>
-                                                <span>Hadir</span>
-                                            </div>
-                                        </label>
+                                    <!-- IZIN -->
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="absensi[{{ $siswa->id }}]" value="Izin" 
+                                            {{ $statusAwal === 'izin' ? 'checked' : '' }} 
+                                            class="peer sr-only">
+                                        <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
+                                            peer-checked:bg-sky-500 peer-checked:text-white peer-checked:border-sky-500 
+                                            flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
+                                            <span class="w-2 h-2 rounded-full bg-sky-500 peer-checked:bg-white transition-colors"></span>
+                                            <span>Izin</span>
+                                        </div>
+                                    </label>
 
-                                        <!-- IZIN -->
-                                        <label class="relative cursor-pointer">
-                                            <input type="radio" name="absensi[{{ $siswa->id }}]" value="Izin" 
-                                                {{ $statusAwal === 'izin' ? 'checked' : '' }} 
-                                                class="peer sr-only">
-                                            <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
-                                                peer-checked:bg-sky-500 peer-checked:text-white peer-checked:border-sky-500 
-                                                flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
-                                                <span class="w-2 h-2 rounded-full bg-sky-500 peer-checked:bg-white transition-colors"></span>
-                                                <span>Izin</span>
-                                            </div>
-                                        </label>
+                                    <!-- SAKIT -->
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="absensi[{{ $siswa->id }}]" value="Sakit" 
+                                            {{ $statusAwal === 'sakit' ? 'checked' : '' }} 
+                                            class="peer sr-only">
+                                        <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
+                                            peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 
+                                            flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
+                                            <span class="w-2 h-2 rounded-full bg-amber-500 peer-checked:bg-white transition-colors"></span>
+                                            <span>Sakit</span>
+                                        </div>
+                                    </label>
 
-                                        <!-- SAKIT -->
-                                        <label class="relative cursor-pointer">
-                                            <input type="radio" name="absensi[{{ $siswa->id }}]" value="Sakit" 
-                                                {{ $statusAwal === 'sakit' ? 'checked' : '' }} 
-                                                class="peer sr-only">
-                                            <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
-                                                peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 
-                                                flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
-                                                <span class="w-2 h-2 rounded-full bg-amber-500 peer-checked:bg-white transition-colors"></span>
-                                                <span>Sakit</span>
-                                            </div>
-                                        </label>
-
-                                        <!-- ALPA -->
-                                        <label class="relative cursor-pointer">
-                                            <input type="radio" name="absensi[{{ $siswa->id }}]" value="Alpa" 
-                                                {{ $statusAwal === 'alpa' ? 'checked' : '' }} 
-                                                class="peer sr-only">
-                                            <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
-                                                peer-checked:bg-rose-500 peer-checked:text-white peer-checked:border-rose-500 
-                                                flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
-                                                <span class="w-2 h-2 rounded-full bg-rose-500 peer-checked:bg-white transition-colors"></span>
-                                                <span>Alpa</span>
-                                            </div>
-                                        </label>
-
-                                    </div>
-
-                                    <!-- Keterangan -->
-                                    <div class="sm:w-1/4">
-                                        <input type="text" name="keterangan[{{ $siswa->id }}]" value="{{ $currentKeterangan }}" placeholder="Catatan (opsional)..." class="w-full text-xs border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50/50 focus:bg-white transition-all py-2 px-3">
-                                    </div>
+                                    <!-- ALPA -->
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="absensi[{{ $siswa->id }}]" value="Alpa" 
+                                            {{ $statusAwal === 'alpa' ? 'checked' : '' }} 
+                                            class="peer sr-only">
+                                        <div class="py-2 px-2 sm:px-3.5 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 bg-white 
+                                            peer-checked:bg-rose-500 peer-checked:text-white peer-checked:border-rose-500 
+                                            flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-1.5 transition-all shadow-sm hover:bg-gray-50 select-none">
+                                            <span class="w-2 h-2 rounded-full bg-rose-500 peer-checked:bg-white transition-colors"></span>
+                                            <span>Alpa</span>
+                                        </div>
+                                    </label>
 
                                 </div>
-                            @endforeach
-                        </div>
 
-                        <!-- Bottom Bar Simpan -->
-                        <div class="p-3.5 sm:p-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between">
-                            <span class="text-xs text-gray-500 font-medium hidden sm:inline-block">Pastikan data yang dimasukkan sudah benar sebelum menyimpan.</span>
-                            <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 text-xs sm:text-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                Simpan Data Absensi
-                            </button>
-                        </div>
-                    </form>
+                                <!-- Keterangan -->
+                                <div class="sm:w-1/4">
+                                    <input type="text" name="keterangan[{{ $siswa->id }}]" value="{{ $currentKeterangan }}" placeholder="Catatan (opsional)..." class="w-full text-xs border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50/50 focus:bg-white transition-all py-2 px-3">
+                                </div>
+
+                            </div>
+                        @endforeach
+                    </div>
+
                 </div>
+                <!-- Bottom Bar Simpan -->
+                <div class="p-4 mt-2 bg-white lg:bg-gray-50/80 rounded-2xl lg:rounded-2xl border border-gray-100 shadow-lg lg:shadow-xs flex items-center justify-between sticky bottom-4 z-10 backdrop-blur-md">Pastikan data yang dimasukkan sudah benar sebelum menyimpan.</span>
+                    <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Simpan Data Absensi
+                    </button>
+                </div>
+            </form>
             @endif
             <!-- Card Filter Rekapitulasi Absensi -->
             <!-- Form Rekapitulasi Absensi -->
