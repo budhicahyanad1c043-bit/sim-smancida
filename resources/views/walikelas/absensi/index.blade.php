@@ -158,7 +158,7 @@
                                     @foreach ($siswas as $index => $siswa)
                                         @php
                                             $dataAbsensi = $existingAbsensi->get($siswa->id);
-                                            $currentStatus = $dataAbsensi ? ucfirst(strtolower($dataAbsensi->status)) : 'Hadir';
+                                            $currentStatus = $dataAbsensi ? ucfirst(strtolower($dataAbsensi->status)) : 'hadir';
                                             $currentKeterangan = $dataAbsensi ? $dataAbsensi->keterangan : '';
                                         @endphp
                                         <tr class="hover:bg-indigo-50/20 transition">
@@ -169,7 +169,7 @@
                                                 <div class="flex items-center justify-center gap-1.5">
                                                     <!-- Hadir -->
                                                     <div>
-                                                        <input type="radio" id="h-hadir-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="Hadir" {{ $currentStatus === 'Hadir' ? 'checked' : '' }} class="peer hidden">
+                                                        <input type="radio" id="h-hadir-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="Hadir" {{ $currentStatus === 'hadir' ? 'checked' : '' }} class="peer hidden">
                                                         <label for="h-hadir-{{ $siswa->id }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 bg-white peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:border-emerald-500 cursor-pointer transition flex items-center gap-1.5 hover:bg-gray-50 select-none">
                                                             <span class="w-2 h-2 rounded-full bg-emerald-500 peer-checked:bg-white"></span> Hadir
                                                         </label>
@@ -177,7 +177,7 @@
 
                                                     <!-- Izin -->
                                                     <div>
-                                                        <input type="radio" id="h-izin-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="Izin" {{ $currentStatus === 'Izin' ? 'checked' : '' }} class="peer hidden">
+                                                        <input type="radio" id="h-izin-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="Izin" {{ $currentStatus === 'izin' ? 'checked' : '' }} class="peer hidden">
                                                         <label for="h-izin-{{ $siswa->id }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 bg-white peer-checked:bg-sky-500 peer-checked:text-white peer-checked:border-sky-500 cursor-pointer transition flex items-center gap-1.5 hover:bg-gray-50 select-none">
                                                             <span class="w-2 h-2 rounded-full bg-sky-500 peer-checked:bg-white"></span> Izin
                                                         </label>
@@ -185,7 +185,7 @@
 
                                                     <!-- Sakit -->
                                                     <div>
-                                                        <input type="radio" id="h-sakit-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="Sakit" {{ $currentStatus === 'Sakit' ? 'checked' : '' }} class="peer hidden">
+                                                        <input type="radio" id="h-sakit-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="sakit" {{ $currentStatus === 'sakit' ? 'checked' : '' }} class="peer hidden">
                                                         <label for="h-sakit-{{ $siswa->id }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 bg-white peer-checked:bg-amber-500 peer-checked:text-white peer-checked:border-amber-500 cursor-pointer transition flex items-center gap-1.5 hover:bg-gray-50 select-none">
                                                             <span class="w-2 h-2 rounded-full bg-amber-500 peer-checked:bg-white"></span> Sakit
                                                         </label>
@@ -193,7 +193,7 @@
 
                                                     <!-- Alpa -->
                                                     <div>
-                                                        <input type="radio" id="h-alpa-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="Alpa" {{ $currentStatus === 'Alpa' ? 'checked' : '' }} class="peer hidden">
+                                                        <input type="radio" id="h-alpa-{{ $siswa->id }}" name="absensi[{{ $siswa->id }}]" value="Alpa" {{ $currentStatus === 'alpa' ? 'checked' : '' }} class="peer hidden">
                                                         <label for="h-alpa-{{ $siswa->id }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 bg-white peer-checked:bg-rose-500 peer-checked:text-white peer-checked:border-rose-500 cursor-pointer transition flex items-center gap-1.5 hover:bg-gray-50 select-none">
                                                             <span class="w-2 h-2 rounded-full bg-rose-500 peer-checked:bg-white"></span> Alpa
                                                         </label>

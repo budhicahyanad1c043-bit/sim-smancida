@@ -177,7 +177,7 @@
 
                 </div>
                 <!-- Bottom Bar Simpan -->
-                <div class="p-4 mt-2 bg-white lg:bg-gray-50/80 rounded-2xl lg:rounded-2xl border border-gray-100 shadow-lg lg:shadow-xs flex items-center justify-between sticky bottom-4 z-10 backdrop-blur-md">Pastikan data yang dimasukkan sudah benar sebelum menyimpan.</span>
+                <div class="p-4 mt-2 bg-white lg:bg-gray-50/80 rounded-2xl lg:rounded-2xl border border-gray-100 shadow-lg lg:shadow-xs flex items-center justify-between sticky bottom-4 z-10 backdrop-blur-md"><span class="text-xs text-gray-500 font-medium hidden sm:inline-block">Pastikan data yang dimasukkan sudah benar sebelum menyimpan.</span>
                     <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-2.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 text-xs sm:text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Simpan Data Absensi
