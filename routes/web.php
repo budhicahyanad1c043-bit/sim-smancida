@@ -16,7 +16,8 @@ use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\JadwalPelajaranController;
 use App\Http\Controllers\Admin\JamPelajaranController;
 use App\Http\Controllers\JadwalPelajaranSGController;
-
+use App\Http\Controllers\KepalaSekolah\DashboardKSController;
+use App\Http\Controllers\Admin\LokasiAbsensiController;
 
 
 // Redirect Halaman Utama ke Login
@@ -69,8 +70,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('role', RoleController::class);
     // Kelola User & Role
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
     Route::post('/roles', [UserController::class, 'storeRole'])->name('roles.store');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     // TAMBAHKAN ROUTE SISWA DI SINI
     Route::post('siswa/import', [SiswaController::class, 'import'])->name('siswa.import');
     Route::resource('siswa', SiswaController::class);
@@ -80,6 +83,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('jadwal', [JadwalPelajaranController::class, 'index'])->name('jadwal.index');
     Route::post('jadwal', [JadwalPelajaranController::class, 'store'])->name('jadwal.store');
     Route::delete('jadwal/{jadwal}', [JadwalPelajaranController::class, 'destroy'])->name('jadwal.destroy');
+
+    Route::get('/lokasi', [LokasiAbsensiController::class, 'index'])->name('lokasi.index');
+    Route::put('/lokasi', [LokasiAbsensiController::class, 'update'])->name('lokasi.update');
     
 });
 
@@ -90,6 +96,7 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(f
     Route::post('/absensi', [AbsensiMapelController::class, 'store'])->name('absensi.store');
     Route::get('/jadwal-pelajaran', [JadwalPelajaranSGController::class, 'indexGuru'])->name('jadwal.index');
     Route::get('/absensi/rekap', [AbsensiMapelController::class, 'rekap'])->name('absensi.rekap');
+    Route::delete('/absensi/reset', [App\Http\Controllers\Guru\AbsensiMapelController::class, 'reset'])->name('absensi.reset');
     
 });
 
@@ -109,7 +116,9 @@ Route::middleware(['auth', 'role:guru_bk'])->prefix('gurubk')->name('gurubk.')->
 
 // 5. ROLE: KEPALA SEKOLAH
 Route::middleware(['auth', 'role:kepala_sekolah'])->prefix('kepsek')->name('kepsek.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'kepsek'])->name('dashboard');
+    // Route::get('/dashboard', [DashboardController::class, 'kepsek'])->name('dashboard');
+    Route::get('/dashboard', [DashboardKSController::class, 'index'])->name('dashboard');
+    Route::get('/realtime-data', [DashboardKSController::class, 'realtimeData'])->name('realtime-data');
 });
 
 // 6. ROLE: SISWA

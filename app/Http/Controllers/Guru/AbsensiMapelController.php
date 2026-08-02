@@ -10,7 +10,6 @@ use App\Models\Siswa;
 use App\Models\Guru;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class AbsensiMapelController extends Controller
 {
@@ -29,10 +28,9 @@ class AbsensiMapelController extends Controller
 
         if ($selectedKelas && $selectedMapel) {
             $siswas = Siswa::where('kelas_id', $selectedKelas)
-            ->orderBy('nama_siswa', 'asc')
-            ->get();
+                ->orderBy('nama_siswa', 'asc')
+                ->get();
 
-            // KUNCI PERBAIKAN: Gunakan 'mata_pelajaran_id' sesuai isi Model Absensi
             $existingAbsensi = Absensi::where('kelas_id', $selectedKelas)
                 ->where('mata_pelajaran_id', $selectedMapel)
                 ->whereDate('tanggal', $tanggal)
@@ -49,21 +47,71 @@ class AbsensiMapelController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Validasi Input Dasar + GPS & Device ID
         $request->validate([
-            'kelas_id' => 'required',
-            'mapel_id' => 'required',
-            'tanggal'  => 'required',
-            'absensi'  => 'required|array',
+            'kelas_id'  => 'required',
+            'mapel_id'  => 'required',
+            'tanggal'   => 'required',
+            'absensi'   => 'required|array',
+            'latitude'  => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'device_id' => 'required|string',
+        ], [
+            'latitude.required'  => 'Gagal! Lokasi GPS tidak terdeteksi.',
+            'longitude.required' => 'Gagal! Lokasi GPS tidak terdeteksi.',
+            'device_id.required' => 'Gagal! Identitas perangkat tidak valid.',
         ]);
 
-        $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
         $user = auth()->user();
+
+        // -------------------------------------------------------------
+        // VALIDASI 1: LOCK DEVICE (1 Perangkat untuk 1 Guru)
+        // -------------------------------------------------------------
+        $incomingDeviceId = $request->input('device_id');
+
+        // Jika user/guru belum terdaftar device_token-nya, kunci ke device ini
+        if (empty($user->device_token)) {
+            $user->update(['device_token' => $incomingDeviceId]);
+        } 
+        // Jika sudah ada, cocokkan apakah perangkat yang dipakai sama
+        else if ($user->device_token !== $incomingDeviceId) {
+            return redirect()->back()->with('error', 'Gagal Absen! Anda menggunakan perangkat yang berbeda dengan yang terdaftar. Harap gunakan HP/Laptop utama Anda.');
+        }
+
+        // -------------------------------------------------------------
+        // VALIDASI 2: GEOFENCING (Batas Jarak GPS Sekolah)
+        // -------------------------------------------------------------
+
+        $lokasi = \App\Models\Pengaturan::first();
+
+        // Koordinat Sekolah & Radius Toleransi (Bisa diatur via .env)
+        // $sekolahLat = env('SEKOLAH_LATITUDE', -6.200000); 
+        // $sekolahLng = env('SEKOLAH_LONGITUDE', 106.816666);
+        // $maxRadius  = env('SEKOLAH_RADIUS_METER', 50); // Maksimal 50 meter
+        $sekolahLat = \App\Models\Pengaturan::where('key', 'latitude')->value('value') ?? -6.8700621303246825;
+        $sekolahLng = \App\Models\Pengaturan::where('key', 'longitude')->value('value') ?? 106.77236014143656;
+        $maxRadius  = \App\Models\Pengaturan::where('key', 'radius')->value('value') ?? 100;
+
+        $jarak = $this->hitungJarakHaversine(
+            $request->latitude, 
+            $request->longitude, 
+            $sekolahLat, 
+            $sekolahLng
+        );
+
+        if ($jarak > $maxRadius) {
+            return redirect()->back()->with('error', "Gagal Absen! Anda berada di luar area sekolah/kelas. Jarak Anda: " . round($jarak) . " meter dari lokasi sekolah.");
+        }
+
+        // -------------------------------------------------------------
+        // PROSES SIMPAN ABSENSI
+        // -------------------------------------------------------------
+        $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
         $guruId = $user->guru->id ?? Guru::where('user_id', $user->id)->value('id');
 
         foreach ($request->absensi as $siswaId => $status) {
-
             $keterangan = $request->keterangan[$siswaId] ?? null;
-            // KUNCI PERBAIKAN: Simpan ke kolom 'mata_pelajaran_id'
+
             Absensi::updateOrCreate(
                 [
                     'tanggal'           => $tanggal,
@@ -84,7 +132,7 @@ class AbsensiMapelController extends Controller
             'kelas_id' => $request->kelas_id,
             'mapel_id' => $request->mapel_id,
             'tanggal'  => $tanggal,
-        ])->with('success', 'Data absensi mata pelajaran berhasil disimpan!');
+        ])->with('success', 'Data absensi berhasil disimpan (Lokasi & Perangkat Terverifikasi)!');
     }
 
     public function rekap(Request $request)
@@ -96,26 +144,21 @@ class AbsensiMapelController extends Controller
             'mapel_id'        => 'required',
         ]);
 
-        // 1. Pastikan Format Tanggal Sesuai (YYYY-MM-DD)
         $tglMulai   = Carbon::parse($request->tanggal_mulai)->format('Y-m-d');
         $tglSelesai = Carbon::parse($request->tanggal_selesai)->format('Y-m-d');
 
-        // 2. Ambil data Kelas dan Mata Pelajaran
         $kelas = Kelas::find($request->kelas_id);
         $mapel = MataPelajaran::find($request->mapel_id);
 
-        // 3. Ambil daftar Siswa
         $siswas = Siswa::where('kelas_id', $request->kelas_id)
             ->orderBy('nama_siswa', 'asc')
             ->get();
 
-        // 4. Query Rekapitulasi (PERBAIKAN: Gunakan 'mata_pelajaran_id')
         $rekapRaw = Absensi::where('kelas_id', $request->kelas_id)
             ->where('mata_pelajaran_id', $request->mapel_id)
             ->whereBetween('tanggal', [$tglMulai, $tglSelesai])
             ->get();
 
-        // Grouping & Counting secara manual per siswa
         $rekap = [];
         foreach ($siswas as $siswa) {
             $absensiSiswa = $rekapRaw->where('siswa_id', $siswa->id);
@@ -131,4 +174,48 @@ class AbsensiMapelController extends Controller
         return view('guru.absensi.rekap-pdf', compact('siswas', 'rekap', 'kelas', 'mapel', 'request', 'tglMulai', 'tglSelesai'));
     }
 
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'kelas_id' => 'required',
+            'mapel_id' => 'required',
+            'tanggal'  => 'required|date',
+        ]);
+
+        $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
+
+        $deleted = Absensi::where('kelas_id', $request->kelas_id)
+            ->where('mata_pelajaran_id', $request->mapel_id)
+            ->whereDate('tanggal', $tanggal)
+            ->delete();
+
+        if ($deleted) {
+            return redirect()->route('guru.absensi.index', [
+                'kelas_id' => $request->kelas_id,
+                'mapel_id' => $request->mapel_id,
+                'tanggal'  => $tanggal,
+            ])->with('success', 'Data absensi untuk tanggal ' . Carbon::parse($tanggal)->translatedFormat('d F Y') . ' berhasil direset!');
+        }
+
+        return redirect()->back()->with('error', 'Tidak ada data absensi yang ditemukan untuk direset.');
+    }
+
+    /**
+     * Rumus Haversine untuk Menghitung Jarak GPS (Meter)
+     */
+    private function hitungJarakHaversine($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371000; // Radius Bumi dalam satuan Meter
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
+    }
 }
