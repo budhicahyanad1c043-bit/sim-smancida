@@ -425,4 +425,22 @@
             );
         }
     </script>
+    <!-- Input Hidden untuk dikirim saat submit form -->
+    <input type="hidden" name="device_id" id="device_id_input">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Ambil device_id yang sudah tersimpan di browser
+            let deviceId = localStorage.getItem('app_device_id');
+
+            // Jika belum ada di browser ini, buat ID acak unik lalu simpan
+            if (!deviceId) {
+                deviceId = 'DEV-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                localStorage.setItem('app_device_id', deviceId);
+            }
+
+            // Set nilai ke input form
+            document.getElementById('device_id_input').value = deviceId;
+        });
+    </script>
 </x-app-layout>

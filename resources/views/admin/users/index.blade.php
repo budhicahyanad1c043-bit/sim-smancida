@@ -5,7 +5,26 @@
         </h2>
     </x-slot>
 
-    <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6" x-data="{ modalTambah: false, modalEdit: false, modalDelete: false, editUser: {}, deleteUser: {} }">
+    <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6" 
+         x-data="{ 
+            modalTambah: false, 
+            modalEdit: false, 
+            modalDelete: false, 
+            editUser: { id: '', name: '', email: '' }, 
+            deleteUser: { id: '', name: '' },
+            editActionUrl: '',
+            deleteActionUrl: '',
+            openEdit(user) {
+                this.editUser = user;
+                this.editActionUrl = '{{ url('admin/users') }}/' + user.id;
+                this.modalEdit = true;
+            },
+            openDelete(user) {
+                this.deleteUser = user;
+                this.deleteActionUrl = '{{ url('admin/users') }}/' + user.id;
+                this.modalDelete = true;
+            }
+         }">
 
         <!-- Notifikasi Sukses -->
         @if (session('success'))
@@ -24,23 +43,22 @@
             </div>
         @endif
 
-        <!-- Grid Top Bar: Tambah Role, Tambah User, & Pencarian -->
+        <!-- Grid Top Bar -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-6">
             
-            <!-- Card Tambah Role Baru -->
-            <!-- 1. Form Tambah Role (Mengambil 4 Kolom) -->
+            <!-- 1. Form Tambah Role -->
             <div class="md:col-span-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-center">
                 <span class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">+ TAMBAH ROLE</span>
                 <form action="{{ route('admin.roles.store') }}" method="POST" class="flex items-center gap-2">
                     @csrf
-                    <input type="text" name="name" placeholder="Role baru..." class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500">
+                    <input type="text" name="name" placeholder="Role baru..." class="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-500" required>
                     <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">
                         Simpan
                     </button>
                 </form>
             </div>
 
-            <!-- 2. Tombol Tambah User Baru (Mengambil 3 Kolom) -->
+            <!-- 2. Tombol Tambah User Baru -->
             <div class="md:col-span-3 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center">
                 <button @click="modalTambah = true" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition text-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
@@ -48,8 +66,7 @@
                 </button>
             </div>
 
-            <!-- Card Pencarian User -->
-            <!-- 3. Form Pencarian (Mengambil 5 Kolom) -->
+            <!-- 3. Form Pencarian -->
             <div class="md:col-span-5 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center">
                 <form action="{{ route('admin.users.index') }}" method="GET" class="w-full flex items-center gap-2">
                     <div class="relative w-full">
@@ -66,7 +83,7 @@
 
         </div>
 
-        <!-- Tabel Daftar User & Pengaturan Role -->
+        <!-- Tabel Daftar User -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -100,7 +117,7 @@
                                     @endforelse
                                 </td>
                                 <td class="py-3.5 px-5">
-                                    <form action="{{ route('admin.users.update-role', $user) }}" method="POST" class="flex items-center gap-2">
+                                    <form action="{{ route('admin.users.update-role', $user->id) }}" method="POST" class="flex items-center gap-2">
                                         @csrf
                                         @method('PUT')
                                         <div class="flex flex-wrap items-center gap-1.5">
@@ -121,13 +138,13 @@
                                 <td class="py-3.5 px-5 text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <!-- Tombol Edit User -->
-                                        <button @click="editUser = { id: {{ $user->id }}, name: '{{ $user->name }}', email: '{{ $user->email }}' }; modalEdit = true"
+                                        <button @click="openEdit({{ json_encode(['id' => $user->id, 'name' => $user->name, 'email' => $user->email]) }})"
                                             class="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all" title="Edit User">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         </button>
 
                                         <!-- Tombol Hapus User -->
-                                        <button @click="deleteUser = { id: {{ $user->id }}, name: '{{ $user->name }}' }; modalDelete = true"
+                                        <button @click="openDelete({{ json_encode(['id' => $user->id, 'name' => $user->name]) }})"
                                             class="p-1.5 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg transition-all" title="Hapus User">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                         </button>
@@ -197,7 +214,7 @@
                     <h3 class="font-bold text-gray-800 text-sm">Edit Data User</h3>
                     <button @click="modalEdit = false" class="text-gray-400 hover:text-gray-600">&times;</button>
                 </div>
-                <form :action="`{{ url('admin/users') }}/${editUser.id}`" method="POST" class="space-y-3">
+                <form :action="editActionUrl" method="POST" class="space-y-3">
                     @csrf
                     @method('PUT')
                     <div>
@@ -228,7 +245,7 @@
                 </div>
                 <h3 class="font-bold text-gray-800 text-sm">Konfirmasi Hapus User</h3>
                 <p class="text-xs text-gray-500">Apakah Anda yakin ingin menghapus user <span class="font-bold text-gray-800" x-text="deleteUser.name"></span>? Tindakan ini tidak dapat dibatalkan.</p>
-                <form :action="`{{ url('admin/users') }}/${deleteUser.id}`" method="POST" class="flex justify-center gap-2 pt-2">
+                <form :action="deleteActionUrl" method="POST" class="flex justify-center gap-2 pt-2">
                     @csrf
                     @method('DELETE')
                     <button type="button" @click="modalDelete = false" class="px-4 py-2 text-xs font-semibold bg-gray-100 rounded-xl text-gray-600">Batal</button>

@@ -69,8 +69,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('mapel', MataPelajaranController::class);
     Route::resource('role', RoleController::class);
     // Kelola User & Role
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    // Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    // Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::resource('users', UserController::class);
     Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.update-role');
     Route::post('/roles', [UserController::class, 'storeRole'])->name('roles.store');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');

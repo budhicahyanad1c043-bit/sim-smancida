@@ -47,7 +47,7 @@ class AbsensiMapelController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validasi Input Dasar + GPS & Device ID
+        // 1. Validasi Input
         $request->validate([
             'kelas_id'  => 'required',
             'mapel_id'  => 'required',
@@ -56,39 +56,20 @@ class AbsensiMapelController extends Controller
             'latitude'  => 'required|numeric',
             'longitude' => 'required|numeric',
             'device_id' => 'required|string',
-        ], [
-            'latitude.required'  => 'Gagal! Lokasi GPS tidak terdeteksi.',
-            'longitude.required' => 'Gagal! Lokasi GPS tidak terdeteksi.',
-            'device_id.required' => 'Gagal! Identitas perangkat tidak valid.',
         ]);
 
         $user = auth()->user();
 
-        // -------------------------------------------------------------
-        // VALIDASI 1: LOCK DEVICE (1 Perangkat untuk 1 Guru)
-        // -------------------------------------------------------------
+        // 2. LOCK DEVICE
         $incomingDeviceId = $request->input('device_id');
 
-        // Jika device_token di DB masih kosong, kunci ke perangkat saat ini
-        if (!$user->device_token) {
+        if (empty($user->device_token)) {
             $user->forceFill(['device_token' => $incomingDeviceId])->save();
-        } 
-        // Jika berbeda dengan device_token yang terdaftar
-        else if ($user->device_token !== $incomingDeviceId) {
-            return redirect()->back()->with('error', 'Gagal Absen! Akun Anda sudah terdaftar di HP/Laptop lain. Harap gunakan perangkat utama Anda.');
+        } else if ($user->device_token !== $incomingDeviceId) {
+            return redirect()->back()->with('error', 'Gagal Absen! Akun Anda terikat pada HP/Laptop lain.');
         }
 
-        // -------------------------------------------------------------
-        // VALIDASI 2: GEOFENCING (Batas Jarak GPS Sekolah)
-        // -------------------------------------------------------------
-
-        $lokasi = \App\Models\Pengaturan::first();
-
-        // Koordinat Sekolah & Radius Toleransi (Bisa diatur via .env)
-        // $sekolahLat = env('SEKOLAH_LATITUDE', -6.200000); 
-        // $sekolahLng = env('SEKOLAH_LONGITUDE', 106.816666);
-        // $maxRadius  = env('SEKOLAH_RADIUS_METER', 50); // Maksimal 50 meter
-        // Ambil setting lokasi dari tabel pengaturans
+        // 3. GEOFENCING (Ambil Nilai DB Pengaturan)
         $sekolahLat = (float) (\App\Models\Pengaturan::where('key', 'latitude')->value('value') ?? -6.8700621);
         $sekolahLng = (float) (\App\Models\Pengaturan::where('key', 'longitude')->value('value') ?? 106.7723601);
         $maxRadius  = (float) (\App\Models\Pengaturan::where('key', 'radius')->value('value') ?? 100);
@@ -101,18 +82,14 @@ class AbsensiMapelController extends Controller
         );
 
         if ($jarak > $maxRadius) {
-            return redirect()->back()->with('error', "Gagal Absen! Anda berada di luar area sekolah/kelas. Jarak Anda: " . round($jarak) . " meter dari lokasi sekolah.");
+            return redirect()->back()->with('error', "Gagal Absen! Anda berada di luar area sekolah. Jarak: " . round($jarak) . " meter.");
         }
 
-        // -------------------------------------------------------------
-        // PROSES SIMPAN ABSENSI
-        // -------------------------------------------------------------
+        // 4. SIMPAN DATA ABSENSI
         $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
-        $guruId = $user->guru->id ?? Guru::where('user_id', $user->id)->value('id');
+        $guruId  = $user->guru->id ?? Guru::where('user_id', $user->id)->value('id');
 
         foreach ($request->absensi as $siswaId => $status) {
-            $keterangan = $request->keterangan[$siswaId] ?? null;
-
             Absensi::updateOrCreate(
                 [
                     'tanggal'           => $tanggal,
@@ -121,10 +98,10 @@ class AbsensiMapelController extends Controller
                     'siswa_id'          => $siswaId,
                 ],
                 [
-                    'guru_id'           => $guruId,
-                    'status'            => $status,
-                    'tipe'              => 'mapel',
-                    'keterangan'        => $keterangan,
+                    'guru_id'    => $guruId,
+                    'status'     => $status,
+                    'tipe'       => 'mapel',
+                    'keterangan' => $request->keterangan[$siswaId] ?? null,
                 ]
             );
         }
@@ -133,7 +110,7 @@ class AbsensiMapelController extends Controller
             'kelas_id' => $request->kelas_id,
             'mapel_id' => $request->mapel_id,
             'tanggal'  => $tanggal,
-        ])->with('success', 'Data absensi berhasil disimpan (Lokasi & Perangkat Terverifikasi)!');
+        ])->with('success', 'Data absensi berhasil disimpan!');
     }
 
     public function rekap(Request $request)
