@@ -70,10 +70,9 @@ class AbsensiMapelController extends Controller
         }
 
         // 3. GEOFENCING (Ambil Nilai DB Pengaturan)
-        $sekolahLat = (float) (\App\Models\Pengaturan::where('key', 'latitude')->value('value') ?? -6.8700621);
-        $sekolahLng = (float) (\App\Models\Pengaturan::where('key', 'longitude')->value('value') ?? 106.7723601);
-        $maxRadius  = (float) (\App\Models\Pengaturan::where('key', 'radius')->value('value') ?? 100);
-
+        $sekolahLat = (float) (\App\Models\Pengaturan::where('key', 'latitude_sekolah')->value('value') ?? -6.782073);
+        $sekolahLng = (float) (\App\Models\Pengaturan::where('key', 'longitude_sekolah')->value('value') ?? 106.731083);
+        $maxRadius  = (float) (\App\Models\Pengaturan::where('key', 'radius_meter')->value('value') ?? 200);
         $jarak = $this->hitungJarakHaversine(
             $request->latitude, 
             $request->longitude, 

@@ -10,9 +10,9 @@ class LokasiAbsensiController extends Controller
 {
     public function index()
     {
-        $latitude  = Pengaturan::where('key', 'latitude_sekolah')->value('value') ?? '-6.782073';
-        $longitude = Pengaturan::where('key', 'longitude_sekolah')->value('value') ?? '106.731083';
-        $radius    = Pengaturan::where('key', 'radius_meter')->value('value') ?? '200';
+        $latitude  = (float) Pengaturan::where('key', 'latitude_sekolah')->value('value') ?? '-6.782073';
+        $longitude = (float) Pengaturan::where('key', 'longitude_sekolah')->value('value') ?? '106.731083';
+        $radius    = (float) Pengaturan::where('key', 'radius_meter')->value('value') ?? '200';
 
         return view('admin.lokasi.index', compact('latitude', 'longitude', 'radius'));
     }
