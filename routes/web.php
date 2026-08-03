@@ -87,6 +87,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/lokasi', [LokasiAbsensiController::class, 'index'])->name('lokasi.index');
     Route::put('/lokasi', [LokasiAbsensiController::class, 'update'])->name('lokasi.update');
+
+    Route::post('/users/{id}/reset-device', [UserController::class, 'resetDevice'])->name('users.reset-device');
     
 });
 

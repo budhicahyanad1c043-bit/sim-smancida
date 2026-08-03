@@ -152,4 +152,14 @@ class UserController extends Controller
 
         return redirect()->back()->with('success', 'User berhasil dihapus.');
     }
+
+    public function resetDevice($id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+        
+        // Set device_token menjadi null
+        $user->update(['device_token' => null]);
+
+        return redirect()->back()->with('success', 'Device token untuk ' . $user->name . ' berhasil direset.');
+    }
 }

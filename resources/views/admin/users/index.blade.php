@@ -143,6 +143,24 @@
                                     </td>
                                     <td class="py-3.5 px-5 text-right">
                                         <div class="flex items-center justify-end gap-2">
+                                            <!-- Indikator & Tombol Reset Device Token -->
+                                            @if ($user->device_token)
+                                                <form action="{{ route('admin.users.reset-device', $user->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mereset kaitan HP/Laptop untuk user {{ $user->name }}?')">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                        class="p-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all flex items-center gap-1 text-[10px] font-semibold" 
+                                                        title="Device Terikat: {{ $user->device_token }}. Klik untuk reset.">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 002-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <span>Reset Device</span>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="text-[10px] text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg">
+                                                    Perangkat Belum Terikat
+                                                </span>
+                                            @endif
                                             <!-- Tombol Edit User -->
                                             <button @click="openEdit({{ json_encode(['id' => $user->id, 'name' => $user->name, 'email' => $user->email]) }})"
                                                 class="p-1.5 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-all" title="Edit User">
